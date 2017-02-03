@@ -1,11 +1,18 @@
 package org.jenkinsci.plugins.all_changes;
 
-/**
- * Created with IntelliJ IDEA.
- * User: awpyv
- * Date: 24/02/13
- * Time: 19:15
- * To change this template use File | Settings | File Templates.
- */
-public class AllChangesRunListener {
+import hudson.Extension;
+import hudson.model.AbstractBuild;
+import hudson.model.FreeStyleBuild;
+import hudson.model.TaskListener;
+import hudson.model.listeners.RunListener;
+
+@Extension
+public class AllChangesRunListener extends RunListener<AbstractBuild> {
+
+    @Override
+    public void onStarted(AbstractBuild build, TaskListener listener) {
+        if (build instanceof FreeStyleBuild && !((FreeStyleBuild) build).getProject().getUpstreamProjects().isEmpty()) {
+            build.addAction(new AllChangesBuildAction(build));
+        }
+    }
 }
